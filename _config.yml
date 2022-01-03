@@ -6,18 +6,18 @@ paginate: 10
 paginate_path: "/page:num/"
 
 # Site settings
-title: Mihai's Programming Blog
-email: amihaiemil@gmail.com
+title: Marco's Programming Blog
+email: thesageofcards@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  This is a blog about programming. Posts will cover various topics and open source projects.
-url: https://www.amihaiemil.com # the base hostname & protocol for your site
-twitter_username: amihaiemil
-github_username:  amihaiemil
+  This is a blog about programming and random stuff.
+url: https://www.randommancer.com # the base hostname & protocol for your site
+twitter_username: randommancer
+github_username:  randommancer
 
 include: ['.well-known']
 
 # Build settings
-timezone: Romania/Bucharest
+timezone: America/Toronto
 markdown: kramdown
 
 lsi: false

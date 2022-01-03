@@ -1,9 +1,0 @@
-#config file for @charlesmike
-commanders:
-  - amihaiemil
-ignored:
-  - *.xml
-  - *.css
-  - *.js
-  - */index.html
-driver: chrome

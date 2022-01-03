@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    getLastUpdateTimestamp("https://api.github.com/repos/amihaiemil/amihaiemil.github.io/commits?sha=master");
+    getLastUpdateTimestamp("https://api.github.com/repos/randommancer/randommancer.github.io/commits?sha=master");
 });
 function getLastUpdateTimestamp(githubCommitsUri) {
     $.support.cors = true;
