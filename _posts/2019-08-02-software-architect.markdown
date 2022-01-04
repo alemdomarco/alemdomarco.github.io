@@ -7,7 +7,7 @@ comments: true
 shareable: true
 author: randommancer
 preview: In a serious organization you need to have some base standards, code quality bar and measurements. This applies, of course, to the projects internal communication
-image: https://maviteixeira.com/images/we_just_need_to_find_her.png
+image: https://randommancer.com/images/we_just_need_to_find_her.png
 ---
 
 In a serious organization you need to have some base standards, code quality bar and measurements. This applies, of course, to the projects internal communication. When working in software projects, it is hard to get some standards between different applications and teams, whether they use the same programming language or not, it obvious that, especially if it breaks the boundaries of different teams.
