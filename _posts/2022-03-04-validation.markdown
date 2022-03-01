@@ -6,28 +6,32 @@ tags: oop
 comments: true
 shareable: true
 author: randommancer
-preview: Writing software is no simple task and comes with a lot of challenges one of which is how to maintain a software for a long time. In this post I want to shine a light upon how we usualy handle validations in a specific scenario and the impact in our maintanability, introducing a different perspective that has been around for several years however I see almost no discussion or adoption in the software community.
+preview: Writing software is no simple task and comes with a lot of challenges that are worth discussing but in this post, I want to shine a light upon one of the hardest ones to address daily, `maintainability`. I want to present a common scenario before refactoring using OOP techniques to a different but not new perspective that has been around for several years however I see almost no discussion or adoption in the software community.
 
 image: https://randommancer.com/images/caffeinated_concert_tickets.png
 --- 
 
 
-Writing software is no simple task and comes with a lot of challenges, one of which is how to maintain software for a long time. In this post I want to shine a light upon how we usually handle validations in a specific scenario and the impact on our maintainability, introducing a different perspective that has been around for several years however I see almost no discussion or adoption in the software community.
+Writing software is no simple task and comes with a lot of challenges that are worth discussing but in this post, I want to shine a light upon one of the hardest ones to address daily, `maintainability`. I want to present a common scenario before refactoring using OOP techniques to a different but not new perspective that has been around for several years however I see almost no discussion or adoption in the software community.
 
-Some years ago I was in charge of breaking down a money exchange payment system of a monolith application into microservices as for reasons you might imagine it was not scaling well enough to hurt the business. 
+Some years ago I was in charge of breaking down a monolith application that handled money exchange payment into microservices, the biggest reason for this change was because the application was not scaling well enough and started to hurt the business.
 
-That was a good opportunity to use DDD techniques for clarifying domain gaps and tightening up code to business. As many people know Domain Driven Design is not about language, pattern or any code specific techniques, in a general way it's about discovering the domain, creating the ubiquitous language and bounded context, so there are no strings attached to any specific framework.
+That was a good opportunity to dive deep into the business knowledge using DDD techniques clarifying domain gaps and tightening up code to business. As many people already know Domain Driven Design is not about language, patterns or any code techniques, it's about domain knowledge, ubiquitous language and bounded context, so there are no strings attached to any specific framework.
 
-It is a very bad idea extract microservices out of the bat in a monolith application as it is hard to have real grasp on what needs to be extracted. So I start isolating the code inside the monolith helping the team to visualize the relationship between code and business, facilitating bounded context creation so we could be more assertive in our microservice extraction.
+The first step was to isolate the existing code in specific contexts inside the monolith, helping the team to visualize the relationship between code and business clarifying what needs to be extracted and the impact of that change.
 
-I researched a ton and I did make a lot of experiments in my pet projects trying to narrow down what I thought was the best solution for some specific implementation scenarios aiming to have as high code quality and maintainability as possible. Long story short the project was a huge success for the company way better than before, however in my vision code wise was not good enough and I had no idea how to make it better.
+After some extensive research and testing, we decided to go for a classic layer architecture in the new microservices using what we thought was the best to maintain high code quality and maintainability. Fast forwarding a little the project was a huge success and we received a huge tap on the back (lol) however the code was not great as our initial vision predicted and after some iterations, we realize some clear maintainability problems with bothered me a lot.
 
-After some thought, I remembered a post about Elegant Objects that I discarded right away just because it feels wrong in my mind to have SQL speaking objects, so I went back to the same post and start to read through an oop series and some other blogs about the same concept but with different ideas, I have even found another spinoff called micro-objects. After years of working with a similar structure, everything around EO sounds wrong at first but then after trying myself and seeing the benefits I start to look for more content, over the years I could just find small blogs from the same community.
+When researching how to improve maintainability I came to cross a community that uses an approach called `Elegant Objects`, after reading some blog posts I move on as what they were claiming and showing seems wrong and was against most of the things I learned in my career, being the biggest one was SQL speaking objects.
 
-Before we continue just a big disclaimer here, I don't think pure EO is the silver bullet and as with all techniques, it has shortcomings however it's a different way of thinking and writing OOP code that in the worst case will aggregate your knowledge and improving the way you solve problems and I believe it could be assembled in today software and discussed for further improvement.
+After a year of trying to find a better way to improve maintainability for the microservice without success I went back to the `EO` community, started to pay more attention to related blogs, worked on some pet projects and also help some open source initiatives that used this technique. That was mind blowing, I learned more about `OOP` at that time than my entire life working/studying in the industry.
 
-Enough of context and let's jump into the code. Below there are 2 classes with their respective tests from a layered architecture project validating some attributes and calling the repository, both save methods are returning a boolean for educational purposes as the focus should be only in the validation step. 
-The classes are doing similar verifications however they have different meanings to the business and can change anytime.
+I know `EO` is not a silver bullet being in some cases too extreme to fit the current industry, however, this line of thinking created different perspectives on the community and implementations leading to variations like for example `micro-objects`. What I will show below is basically `OOP` and it will follow the good standards you probably already know, hopefully, this post will make you at least curious to look further about the `maintainability` and `OOP` subject. Enough of context and let's jump into the code.
+
+There are 2 classes with their respective tests from a classic layered architecture project validating some attributes and calling the repository, both save methods are returning a boolean for educational purposes only as the main focus it's to improve maintainability in the validation step.
+
+Keep in mind both classes are doing similar validations, however, they have different meanings to the business that can change anytime.
+
 
 ### Company class
 {% highlight csharp %}
@@ -52,6 +56,7 @@ public class CompanyService {
     }
 }
 {% endhighlight %}
+
 
 ### Company test class
 {% highlight csharp %}
@@ -110,7 +115,6 @@ public class CompanyServiceTest {
 {% endhighlight %}
 
 
-
 ### User class
 {% highlight csharp %}
 public class UserService {
@@ -134,6 +138,7 @@ public class UserService {
     }
 }
 {% endhighlight %}
+
 
 ### User test class
 {% highlight csharp %}
@@ -191,13 +196,17 @@ public class UserServiceTest {
 }
 {% endhighlight %}
 
-Let's start thinking and refactoring the company class, the first thing I notice is the attribute naming of `employees` in this small class is clear that is the number of employees as we can see the validation a few lines below however that could be easily a CSV text in a different entry point, so I will rename `numberOfEmployees` for now.
 
-Even after renaming the parameter, I noticed that we could go for a primitive obsession problem in the future as both parameters are string and have no meaning to the business, so my second step is to create an interface `FantasyName` this is important because I could have different implementations for company names for example or even for other business classes like contracts between companies.
+Let's start thinking about how to refactor the company class, the first thing I notice is the attribute naming `employees` in this small class is clear that is the number of employees as we can confirm by the validation a few lines below, however, that could be easily a list of employees as the name suggests, so I will rename `numberOfEmployees` for now.
 
-#################### Violating some SOLID principles ###################
+Renaming the parameter is a good start to give more meaning to the method, you also can notice that we are going for a primitive obsession in the long run as string have no meaning to the business. So my second step is to create an abstraction that expresses better the business, I will start with the first parameter creating the `FantasyName` interface.
+
+I want to highlight some nuances here regarding the `Single responsibility principle`, `SOLID` is great but sometimes it's too broad which can make it hard to pinpoint some specific cases like this one. Bear with me on this one, you could argue the service class has too much responsibility as it needs to validate fantasy name and also the number of employees, on the other hand, you could argue the service class just has one responsibility that is validating the company which is also correct.
+
+In our case, we will stick with the former.
 
 
+******** Review stopped *******
 
 
 ### Fantasy name 
