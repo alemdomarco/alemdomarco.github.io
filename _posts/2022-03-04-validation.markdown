@@ -203,22 +203,19 @@ Renaming the parameter is a good start to give more meaning to the method, you a
 
 I want to highlight some nuances here regarding the `Single responsibility principle`, `SOLID` is great but sometimes it's too broad which can make it hard to pinpoint some specific cases like this one. Bear with me on this one, you could argue the service class has too much responsibility as it needs to validate fantasy name and also the number of employees, on the other hand, you could argue the service class just has one responsibility that is validating the company which is also correct.
 
-In our case, we will stick with the former.
+In our case, we will assume the former.
 
 
-******** Review stopped *******
-
-
-### Fantasy name 
+### Fantasy name
 {% highlight csharp %}
 public interface FantasyName {
     string value();
 }
 {% endhighlight %}
 
-You can notice that I'm returning just a plain string and that's ok, bear with me as we are doing small steps here. Now I will create our first implementation `CompanyFantasyName`.
+I created the interface with the same return type of the parameter and now I will create our first implementation `CompanyFantasyName`.
 
-### Company Fantasy name 
+### Company Fantasy name
 {% highlight csharp %}
 public class CompanyFantasyName : FantasyName {
     private readonly string fantasyName;
@@ -234,7 +231,7 @@ public class CompanyFantasyName : FantasyName {
 {% endhighlight %}
 
 
-Not that fancy for now but we will get there, now let's add our new interface to the company service and update the tests to receive the new implementation. I will not paste the entire test class every time but I will keep the project available on Github.
+We created a really fancy implementation that does not do a lot but we will get there, let's add our new interface to the company service and update the tests to work with the new implementation. I will not paste the entire test class every time but you can check the project on Github.
 
 
 {% highlight csharp %}
@@ -261,7 +258,7 @@ public class CompanyService {
 {% endhighlight %}
 
 
-Just give an idea of the updated test.
+Here is a sample of the updated test.
 
 
 {% highlight csharp %}
@@ -274,8 +271,7 @@ Just give an idea of the updated test.
 {% endhighlight %}
 
 
-All green so let's move on.
-In the company service, we are doing 2 validation regarding `FantasyName`, checking if the name is not null or whitespace and the size as we now have a specific class representing our fantasy name we can move the verifications to the class but first let me write some tests.
+In the company service, we are doing 2 validation regarding `FantasyName`. First, we check if the name is not null or whitespace, then we check the size for the name. With that in mind let's move these validations to our new `CompanyFantasyName` class, but first, we will write some tests.
 
 
 {% highlight csharp %}
@@ -311,7 +307,7 @@ public class CompanyFantasyNameTest {
 {% endhighlight %}
 
 
-They are broken now so let's update the class.
+All the tests are failing so we need to make them pass.
 
 
 {% highlight csharp %}
@@ -337,7 +333,7 @@ public class CompanyFantasyName : FantasyName {
 {% endhighlight %}
 
 
-It's all green now, notice that I created different exception messages for each error just to illustrate what can be done, but at the end of the day in your class, you can implement the way you see fit for your context and team. So let's update the `CompanyService`.
+It's all green now, notice that I created different exception messages for each error to illustrate what can be done, but at the end of the day is your class and you can implement the way you see fit for your context. Now let's update the `CompanyService` and the `CompanyServiceTest` class.
 
 
 {% highlight csharp %}
@@ -360,9 +356,9 @@ public class CompanyService {
 {% endhighlight %}
 
 
-Notice how we remove all the fantasy name validation from the service, now we need to update the `CompanyServiceTest` tests to expect an Exception instead of false and if the test passes we should be good to remove all fantasy names tests from the company service test class.
+We remove all fantasy name validation from the service class and the `CompanyServiceTest` is expecting an exception instead of a boolean, these tests are exaclty the same we did in `CompanyFantasyNameTest` so it's safe to delete them if we want to.
 
-We could use the same approach on our `numberOfEmployees` parameter, so let's fast forward to that.
+We could use the same approach on our `numberOfEmployees` parameter, so let's fast forward a litte.
 
 
 ### Number of employees
@@ -445,9 +441,11 @@ public class CompanyService {
 {% endhighlight %}
 
 
-It's is looking good and all the tests are green, let's do a quick recap on what we achieved so far. We provided more meaningful abstraction to both parameters creating specific interfaces, the new classes are responsible for just one single job so they can be easily tested and reused.
+Let's do a quick recap on what we achieved so far. 
 
-When I look back to the UserService class I realize we could use the same approach.
+We provided more meaningful abstractions to both parameters creating specific interfaces `CompanyFantasyName` and `NumberOfEmployees`, the new classes are responsible for just one single job that is validating fantasy name and number of employees respectively, being more focused, reusable and easy to test.
+
+Now back to the `UserService` class, we should be able to see similarities so we will use the same approach to refactor.
 
 
 {% highlight csharp %}
@@ -474,7 +472,7 @@ public class UserService {
 {% endhighlight %}
 
 
-We should start creating the naming interface and its first implementation.
+First, we will create the name interface and implementation.
 
 
 ### Name interface
@@ -508,9 +506,24 @@ public class UserName : Name {
 {% endhighlight %}
 
 
-I noticed the code is very similar in both `CompanyFantasyName` and `UserName` as they both check string validation and size. I could use one interface and class for both, passing some attributes for the length of the characters however as they have different business meaning some changes can add some unnecessary complexity for example if I need to check if the user already exists in the database. I could also create a utility class but that would not have any meaning for the business too.
+This is important, we can notice the code is very similar in both `CompanyFantasyName` and `UserName` as they both check string validation and size.
 
-One thing we could do is create another abstraction that could be reused in both places, for this particular example I will use one interface called `Text` handling the validation inside the implementations just like in EO, just keep in mind you always can do and should do what fits your context the best.
+{% highlight csharp %}
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 100) {
+            return false;
+        }
+{% endhighlight %}
+
+{% highlight csharp %}
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 150) {
+            return false;
+        }
+{% endhighlight %}
+
+
+I could merge both classes receiving the length parameter from the constructor and that would solve my problem, however, if anything changes on `CompanyFantasyName` or `UserName` it will cause some problems to our application and we might need to split the classes again. despite the fact they have a different meaning for the business, so merging them will impact our code/business language (ubiquitous language).
+
+To get rid of this duplication without compromising the business class I will create another abstraction representing a text on the application, this new interface will be named `Text` and I will name the first implementation `SimpleText`.
 
 
 {% highlight csharp %}
@@ -545,15 +558,27 @@ public class SimpleText : Text {
 {% endhighlight %}
 
 
-Now we could use inject `Text` as a dependency inside our `UserName` and `CompanyFantasyName` validating both classes without repeating code but I think we could do better and I will explain why.
+Now we could inject `Text` as a dependency to our `UserName` and `CompanyFantasyName` validating  without repeating code or hurting the meaning.
 
-Both validations are fine inside their respective classes, `UserName` should validate a user name and `CompanyFantasyName` should validate a company fantasy name on the other hand `Text` should validate only text I know it sounds weird but bears with me. If I have another class in the system that wants to validate only if the string is valid and not the length or even do not want to validate at all.
 
-This means `Text` class has more than one responsibility different from their counterparts as it's in charge of validating if the string is not null and also checking if it is in a specific range of characters.
+{% highlight csharp %}
+public class CompanyFantasyName : FantasyName {
+    private readonly Text fantasyName;
 
-So I will use the decorator pattern to add some composition in our `Text` implementations, one for each check and add the tests for it.
+    public CompanyFantasyName(Text fantasyName) {
+        this.fantasyName = fantasyName;
+    }
 
-Let's change simple text and create the null check implementation first.
+    public string value() {
+        return fantasyName.value();
+    }
+}
+{% endhighlight %}
+
+
+We could end here and will be fine for now but what is the responsibility of `SimpleText`, for me this new class is doing too much, it's validating the string and checking its size. What if another class in the system wants to validate a string without checking the size? With the current implementation, this is not possible.
+
+To solve this issue we might need more classes one for each responsibility. To achieve our goal I will use a pattern called `decorator`, so let's get to work.
 
 
 {% highlight csharp %}
@@ -571,7 +596,7 @@ public class SimpleText : Text {
 {% endhighlight %}
 
 
-This class is just a base value holder in case we don't want to validate anything for example when retrieving a text from the database.
+Now our class is just a value holder and it will serve when we need a text without validation like when retrieving text data from the database.
 
 
 {% highlight csharp %}
@@ -594,9 +619,11 @@ public class NotNullText : Text {
 {% endhighlight %}
 
 
-This is the `NotNullText` that does what the name suggests, validating if the text is valid or not, so how can we use this new class?
+This is the `NotNullText` it does what the name suggests, validate if the text is null or whitespace. 
 
-We just need to inject the dependency.
+To use this new class we add a `Text` dependency on `CompanyFantasyName`, then we created a second constructor decorating `SimpleText` with `NotNullText` and calling the primary constructor extending how the class can be created.
+
+Now we have two ways to create `CompanyFantasyName`, we can pass directly a `Text` for testing or specific cases or we can pass a string and let the class compose the validations it needs.
 
 
 {% highlight csharp %}
@@ -621,9 +648,7 @@ public class CompanyFantasyName : FantasyName {
 {% endhighlight %}
 
 
-There are some things to unpack here, first, we create 2 constructors one for text and one for the string as you can see the string one is a little more complicated as it needs to decorate the `SimpleText` class with the `NotNullText` class and also you can notice the latter call the former. This is happening because we have one primary constructor and one secondary constructor and the primary constructor should always be called to create the instance.
-
-One observation is that you can have as many secondary constructors as you want but in the end, you need to call the primary.
+There are some important things to unpack here, first, we created 2 constructors but could be many this is mentioned in `Elegant Objects` as primary and secondary constructors where the primary constructor should always be called in the end by all others secondary constructors ensuring the abstraction that in our case is `Text`.
 
 
 ### Primary constructor
@@ -639,7 +664,7 @@ public CompanyFantasyName(string fantasyName) : this(new NotNullText(new SimpleT
 {% endhighlight %}
 
 
-I think it's good enough for now so let's go back and do the same thing with the character length.
+it's good enough for now so let's go back and do the same thing with the character length validation.
 
 
 {% highlight csharp %}
@@ -666,7 +691,7 @@ public class LimitedText : Text {
 {% endhighlight %}
 
 
-Here we go, now we have a class that the main reason to exist is to validate the string length. If you take a closer look at the secondary constructor you will notice that I'm already creating a `NotNullText` instance as would be great to check this before the length.
+Here we go, now we have a class that the main reason to exist is to validate the string length. If you take a closer look at the secondary constructor you will notice that I'm already creating a `NotNullText` instance as would be important to check if the text is null before the length size.
 
 Now let's change our company name class again.
 
@@ -694,9 +719,7 @@ public class CompanyFantasyName : FantasyName {
 {% endhighlight %}
 
 
-All the tests are passing for `CompanyFantasyName` so we can delete them as these validations are already being tested in the `Text` implementations classes that I did not show like `NotNullTextTest`. Let's do some refactor and add some constructors to get rid of excess of `new` in the secondary.
-
-Here are the results.
+All the tests are passing for `CompanyFantasyName` so we can delete them if we want as these validations are already being tested in the `Text` implementations classes like `NotNullTextTest`. Let's do some refactoring and add some constructors to get rid of excess of `new` in the secondary constructor.
 
 
 {% highlight csharp %}
@@ -741,7 +764,9 @@ public class LimitedText : Text {
 {% endhighlight %}
 
 
-Now let's see what needs to be done in our UserName class.
+I want to highlight the `MaxLength` constant is part of the `CompanyFantasyName` class and it's ok to be hardcoded and not in an external enum.
+
+Here are all the changes we need to do in the `UserName` class after our `Text` abstractions.
 
 
 {% highlight csharp %}
@@ -764,9 +789,9 @@ public class UserName : Name {
 {% endhighlight %}
 
 
-We reused the classes so was an effortless change and after running the tests everything is still green.
+We manage to reuse everything and all the classes are simple and focused.
 
-Moving on to the `CompanyNumberOfEmployees` class we need to parse to int and also check the number of employees on the company, we already learned a couple of things so let's try to go a little faster now and create a `Number` abstraction and a class to parse the string.
+Moving on to the `CompanyNumberOfEmployees` class we need to parse a string to int and also check the number of employees on the company, we already learned a couple of things from our previous refactor so let's try to go a little faster now creating `Number` abstraction and an implementation class to parse the string.
 
 
 {% highlight csharp %}
@@ -796,31 +821,13 @@ public class ParsedNumber : Number {
 {% endhighlight %}
 
 
-It's looking good pretty good but something is a little off, that would work in case we need to use this class to parse a string from an entry point like json/events but if we want to parse some `text` or compose a more rich validation we would have to break encapsulation and would be hard to inject this kind of dependency, let me show in the code below.
-
-
-{% highlight csharp %}
-    var value = limitedText.value();            // Breaking encapsulation
-    var parsedNumber = new ParsedNumber(value)  // This is high coupling
-{% endhighlight %}
-
-
-Let me explain:
-- We are breaking encapsulation because the class that is making the call for value needs to get the data from the abstraction and put it in another abstraction but we should be able to keep the data hidden most of the time.
-- This is high coupling because the class that instantiates the ParsedNumber will have to use the real implementation difficulting tests and maintainability, that's why we instantiate inside the constructor to provide room for different implementations.
-
-So how can we convert some string to int without breaking the abstraction?
-
-We already have a class in place that represents a text so instead of passing a raw string we should pass the text (mind explosion sound). One more thing `ParsedNumber` is not a very helpful name so I will change to a more familiar name at least to me `TextToNumber`.
-
+Something is a little off, this code could work but we also want to make sure the string is not null before parsing, good for us we already have a class that does exactly that. So we just need to inject `Text` in the constructor like we did in the other classes.
 
 {% highlight csharp %}
-public class TextToNumber : Number {
+public class ParsedNumber : Number {
     private readonly Text text;
 
-    public TextToNumber(string text) : this(new NotNullText(text)) { }
-
-    public TextToNumber(Text text) {
+    public ParsedNumber(Text text) {
         this.text = text;
     }
 
@@ -837,7 +844,19 @@ public class TextToNumber : Number {
 {% endhighlight %}
 
 
-Now it's looking good, so let's change our `CompanyNumberOfEmployees` class and run the tests.
+Something magical is happening here, we are receiving a `Text` and returning a `Number` without breaking abstraction or encapsulation, look the code below:
+
+
+{% highlight csharp %}
+Number parsedNumber = new ParsedNumber(
+    new SimpleText(numberOfEmployees)
+)
+{% endhighlight %}
+
+
+We are composing the application keeping everything hidden, for example, the class that will execute the number abstraction has no idea about the composition of the Number, could be like the example above or just a `SimpleNumber`.
+
+Just to make this class more meaningful for reuse I will change its name to `TextToNumber`, I think this new name reflects better what the class is doing it, now let's update our `CompanyNumberOfEmployees` class.
 
 
 {% highlight csharp %}
@@ -862,7 +881,7 @@ public class CompanyNumberOfEmployees : NumberOfEmployees {
 {% endhighlight %}
 
 
-I think we are done with the company stuff. Looking back to `UserService` there is a lot we can change.
+I think we are done with the `CompanyNumberOfEmployees`. Now lets go look back to `UserService` and update the class.
 
 
 {% highlight csharp %}
@@ -912,7 +931,7 @@ public class UserService {
 {% endhighlight %}
 
 
-Now we need to follow the same process and create an Age abstraction.
+Now we need to follow the same process of `CompanyNumberOfEmployees` and create an `Age` abstraction with one implementation.
 
 
 {% highlight csharp %}
@@ -922,7 +941,7 @@ public interface Age {
 {% endhighlight %}
 
 {% highlight csharp %}
-public class UserAge : Age {
+public class UserUserAge : Age {
     private readonly Number age;
 
     public UserAge(string age) : this(new TextToNumber(age)) { }
@@ -943,7 +962,7 @@ public class UserAge : Age {
 {% endhighlight %}
 
 
-Then go back to the service
+Now the `UserService` again.
 
 
 {% highlight csharp %}
@@ -961,46 +980,26 @@ public class UserService {
 {% endhighlight %}
 
 
-Now we have a lot of classes from the initial one in the other hand we have a lot of reusability and meaning for each class, we can still add more classes for the under-aged user and max number of employees but as this code is written just once we can delay this refactor until we need it.
+We could have the urge to refactor `UserUserAge` and `CompanyNumberOfEmployees` trying to join both funcionalities but if you pay close attention you can notice they are not the same code or funcionality so it's better to keep this way for now.
+
+We are done, finishing this refactor with a lot of new classes compared to the initial setup and with tons of reusability/meaning for each one of them.
 
 
 ## Conclusion section
 
-Firstly I want to address a couple of things, this post and refactoring are aiming for code reuse and maintainability. The former is easy to understand but the latter has a lot of nuances as maintainable code could mean different things for different people.
+Firstly I want to address a couple of things, this post is aiming for code reuse and maintainability. The former is easy to understand but the latter has a lot of nuances as maintainable code could mean different things for different people/teams.
 
-Code maintainability for me is the ratio between cost/time when adding new features, correcting bugs, refactoring and understanding the business. We want people to read the code and know what's going on without overloading the brain (cognitive load), if we need to understand 1k lines of code to change it we will very likely introduce bugs or left branches uncovered by tests taking more time than usual even for small changes.
+To clarify a little code maintainability for me is the ratio between cost/time when adding new features, correcting bugs, refactoring and time investment to understand the business. We want people to read the code and know what's going on without overloading the brain (cognitive load), if we need to understand 1k lines of code to change it we will very likely introduce bugs or left code uncovered by tests increasing the risk for the business.
 
-The services classes are small with just one dependency but they will grow eventually becoming more complex which could lead to complicated tests, duplicated and hard to understand code.
+I know the initial service classes were small with just one dependency but they will grow eventually becoming more complex, leading to complicated tests, duplicated and hard to understand code. To give a simple example how many classes in your code today need to verify if a string is not null/empty or has some specific length? How did you test these classes?
 
-To give a simple example how many classes need to verify if a string is not null/empty or has some specific length? How did you test these classes?
+Having classes abstracting and encapsulating data could have a huge impact on your understanding of the code and the amount of code you need to change to add a new feature or fix a bug. The class constructor should not be underestimated and must show what a class needs to exist, providing ways to extend funcionality and increase reusability.
 
-Having classes abstracting and encapsulating data could have a huge impact on your understanding of the code and the amount of code you need to change to add a new feature or fix a bug. The class constructor should not be underestimated and must be used to enforce what the class needs to exist as is the data and dependency entry point.
+I hope you are not scared by the `new` keyword, I know a lot of companies use DI frameworks to create classes, they can facilitate some configuration with some magic but the price is limiting implementations and flexibility of `OOP` but this is a conversation for another post but let me briefly explain.
 
-A lot of companies use DI frameworks so creating a class using the `new` keyword could look really weird but that is what the framework is doing, the only difference is the framework limit any chance of using OOP. This is a conversation for another post but let me briefly explain.
+Everything we do in software is context dependant and there is no silver bullet and this approach has its own problems that I will tackle in later posts but briefly we can see exception handling and memory use (many classes). My main objective is to give some light on a different perspective and see if there is a better way to achieve a better maintainability in software than we do today.
 
-DI is all about passing an abstraction (interface) hiding implementation details (class) usually when you use DI frameworks you have one interface and one implementation which is kinda pointless because, in theory, your abstraction can have an infinite number of implementations but the framework by default cap that at 1. It would be very complicated to create `UserAge` class using a framework but I can easily do using the already known `new` keyword, doing that you bring the responsibility to yourself so you need to be mindful about how to avoid coupling and when its ok to create/compose new classes.
-
-Everything we do in software is context dependant and there is no silver bullet as expected this approach has its own problems that I will tackle in later posts like exception handling and memory (many classes). My main objective is to give some light to a different perspective and see if there is a better way to achieve maintainability than we do today. 
-
-This post has a lot of different things mixed up and I will name it here for a quick search:
-- Elegant Objects
-- Micro Objects
-- Domain Driven Design
-- SOLID principles
-- Layer Architecture (Service/Repository)
-- Decorator (Design pattern)
-
-The code is on my GitHub so feel free to check it out and if you have any thoughts about it just let me know.
-
-
-
-
-
-
-
-
-
-
+If read until here, thank you for your time `:)` and if you have any thoughts about the subject feel free to discuss in the comments section and also check the code on github.s
 
 
 <figure class="articleimg">
