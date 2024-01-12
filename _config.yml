@@ -7,12 +7,12 @@ paginate_path: "/page:num/"
 
 # Site settings
 title: Marco's Programming Blog
-email: thesageofcards@gmail.com
+email: alemdomarco@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   This is a blog about programming and random stuff.
-url: https://www.randommancer.com # the base hostname & protocol for your site
-twitter_username: randommancer
-github_username:  randommancer
+url: https://www.alemdomarco.com # the base hostname & protocol for your site
+twitter_username: alemdomarco
+github_username:  alemdomarco
 
 include: ['.well-known']
 
