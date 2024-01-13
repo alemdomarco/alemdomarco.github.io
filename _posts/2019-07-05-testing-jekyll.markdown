@@ -4,7 +4,7 @@ title:  "First post and testing blog!"
 date:   2019-07-05 23:35:00
 tags: miscellaneous
 comments: true
-author: randommancer
+author: alemdomarco
 preview: First post to check out the blog!
 ---
 

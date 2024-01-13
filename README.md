@@ -1,4 +1,4 @@
-# My blog about programming at https://randommancer.com
+# My blog about programming at https://alemdomarco.com
 
 ## Manual gems for windows
  - webrick

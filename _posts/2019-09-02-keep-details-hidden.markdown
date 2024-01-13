@@ -5,10 +5,10 @@ date:   2019-09-02 21:00:00
 tags: architect, oop
 comments: true
 shareable: true
-author: randommancer
+author: alemdomarco
 preview: While integrating with different backend apps, there is a good chance we face some communication problems, especially if the company lacks the presence of an architect and leaves space for the teams to do whatever they want. With no proper documentation and standards, working with other teams could become a tricky task.
 
-image: https://randommancer.com/images/prank_callers.png
+image: https://alemdomarco.com/images/prank_callers.png
 --- 
 
 While integrating with different backend apps, there is a good chance we face some communication problems, especially if the company lacks the presence of an [architect](https://maviteixeira.com/2019/08/02/software-architect.html) and leaves space for the teams to do whatever they please. With no proper documentation and standards, working with other teams could become a tricky task.

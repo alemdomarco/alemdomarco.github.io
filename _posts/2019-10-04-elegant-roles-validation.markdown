@@ -5,10 +5,10 @@ date:   2019-10-04 22:00:00
 tags: oop
 comments: true
 shareable: true
-author: randommancer
+author: alemdomarco
 preview: When writing applications, eventually you need to create a mechanism to restrict access to part of the system or even to some specific functionality. It's a pretty common issue and I’ve done that many times before, but I never considered doing it in an elegant way.
 
-image: https://randommancer.com/images/caffeinated_concert_tickets.png
+image: https://alemdomarco.com/images/caffeinated_concert_tickets.png
 --- 
 
 When writing applications, eventually you need to create a mechanism to restrict access to part of the system or even to some specific functionality. It's a pretty common issue and I’ve done that many times before, but I never considered doing it in an elegant way.
